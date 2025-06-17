@@ -10,7 +10,7 @@
       background: linear-gradient(135deg, #e2eafc, #dff6ff);
     }
 
-    header {  
+    header {
       display: flex;
       align-items: center;
       padding: 15px 30px;
@@ -50,20 +50,21 @@
     #chatbox {
       background: #f9f9f9;
       border-radius: 12px;
-      padding: 20px;
-      height: 500px;
+      padding: 25px;
+      height: 600px;
       overflow-y: auto;
-      font-size: 17px;
-      line-height: 1.6;
+      font-size: 19px;
+      line-height: 1.7;
       text-align: left;
     }
 
     .message {
       margin: 15px 0;
-      padding: 10px 15px;
+      padding: 12px 18px;
       border-radius: 10px;
-      max-width: 80%;
+      max-width: 85%;
       word-wrap: break-word;
+      font-size: 18px;
     }
 
     .user {
@@ -90,15 +91,15 @@
 
     input[type="text"] {
       flex: 1;
-      padding: 12px;
-      font-size: 16px;
+      padding: 14px;
+      font-size: 17px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
 
     button {
-      padding: 12px 20px;
-      font-size: 16px;
+      padding: 14px 22px;
+      font-size: 17px;
       border-radius: 6px;
       background-color: #007bff;
       color: white;
@@ -117,6 +118,27 @@
       font-size: 14px;
       color: #666;
     }
+
+    @media (max-width: 600px) {
+      #container {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      #chatbox {
+        height: 400px;
+        font-size: 17px;
+      }
+
+      .message {
+        font-size: 16px;
+      }
+
+      input[type="text"], button {
+        font-size: 15px;
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -129,11 +151,11 @@
 
   <div id="container">
     <h2 style="margin-bottom: 5px; font-size: 23px; font-weight: bold; color: #555;">
-        Ask Your Assistant Anything!
-      </h2>
-      <h3 class="subtitle" style="margin-top: 0; font-size: 16px; font-weight: normal; color: #777;">
-        (Natural Language Processing - Large Language Model Project) by Lam Dinh
-      </h3>
+      Ask Your Assistant Anything!
+    </h2>
+    <h3 class="subtitle" style="margin-top: 0; font-size: 16px; font-weight: normal; color: #777;">
+      (Natural Language Processing - Large Language Model Project) by Lam Dinh
+    </h3>
     <div id="chatbox"></div>
 
     <div id="inputRow">
@@ -198,7 +220,7 @@
       const fullText = result.response;
       const target = document.getElementById(aiMessageId);
 
-      typeFast(fullText, target, 5000); // Ensure full response appears within 5 seconds
+      typeFast(fullText, target, 5000);
     }
 
     async function clearHistory() {
