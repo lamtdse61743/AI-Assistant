@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your AI Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e2eafc, #dff6ff);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #333;
+    }
+
+    #container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+
+    h2.subtitle {
+      font-size: 16px;
+      font-weight: normal;
+      color: #777;
+      margin-top: -10px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    #chatbox {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      height: 500px;
+      overflow-y: auto;
+      font-size: 17px;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .message {
+      margin: 15px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background-color: #e1f0ff;
+      align-self: flex-end;
+      text-align: right;
+      font-weight: bold;
+      color: #007bff;
+      margin-left: auto;
+    }
+
+    .ai {
+      background-color: #e6ffe6;
+      text-align: left;
+      font-weight: bold;
+      color: #28a745;
+      margin-right: auto;
+    }
+
+    #inputRow {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #footer {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header with logo -->
+  <header>
+    <img src="{{ url_for('static', filename='logo.svg.png') }}" alt="Fanshawe Logo">
+    <h1>Your AI Assistant</h1>
+  </header>
+
+  <div id="container">
+    <h2 style="margin-bottom: 5px; font-size: 23px; font-weight: bold; color: #555;">
+        Ask Your Assistant Anything!
+      </h2>
+      <h3 class="subtitle" style="margin-top: 0; font-size: 16px; font-weight: normal; color: #777;">
+        (Natural Language Processing - Large Language Model Project) by Lam Dinh
+      </h3>
+    <div id="chatbox"></div>
+
+    <div id="inputRow">
+      <input type="text" id="prompt" placeholder="Type your message..." onkeydown="checkEnter(event)">
+      <button onclick="sendPrompt()">Ask</button>
+      <button onclick="clearHistory()">Clear</button>
+    </div>
+
+    <div id="footer">
+      Powered by Lam Dinh
+    </div>
+  </div>
+
+  <script>
+    function checkEnter(event) {
+      if (event.key === "Enter") sendPrompt();
+    }
+
+    function typeFast(fullText, target, duration = 5000) {
+      const totalChars = fullText.length;
+      const startTime = performance.now();
+      let displayedChars = 0;
+
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const expectedChars = Math.floor((elapsed / duration) * totalChars);
+
+        if (expectedChars > displayedChars) {
+          const chunk = fullText.slice(displayedChars, expectedChars);
+          target.innerHTML += chunk.replace(/\n/g, "<br>");
+          displayedChars = expectedChars;
+          chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        if (displayedChars < totalChars) {
+          setTimeout(() => step(performance.now()), 20);
+        }
+      }
+
+      step(performance.now());
+    }
+
+    async function sendPrompt() {
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) return;
+
+      const chatbox = document.getElementById('chatbox');
+      chatbox.innerHTML += `<div class="message user">You: ${prompt}</div>`;
+      document.getElementById('prompt').value = '';
+
+      const aiMessageId = 'ai-' + Date.now();
+      chatbox.innerHTML += `<div class="message ai" id="${aiMessageId}">AI: </div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'prompt=' + encodeURIComponent(prompt)
+      });
+
+      const result = await response.json();
+      const fullText = result.response;
+      const target = document.getElementById(aiMessageId);
+
+      typeFast(fullText, target, 5000); // Ensure full response appears within 5 seconds
+    }
+
+    async function clearHistory() {
+      await fetch('/clear', { method: 'POST' });
+      document.getElementById('chatbox').innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>
